@@ -23,9 +23,9 @@ const NavStyles = styled.ul`
       padding: 0 10px;
     }
     &:before {
-      content: '';
+      content: "";
       width: 2px;
-      background: ${props => props.theme.lightgrey};
+      background: ${props => props.theme.lightGrey};
       height: 100%;
       left: 0;
       position: absolute;
@@ -36,7 +36,7 @@ const NavStyles = styled.ul`
     &:after {
       height: 2px;
       background: red;
-      content: '';
+      content: "";
       width: 0;
       position: absolute;
       transform: translateX(-50%);
@@ -51,9 +51,9 @@ const NavStyles = styled.ul`
       &:after {
         width: calc(100% - 60px);
       }
-    @media (max-width: 700px) {
+      @media (max-width: 700px) {
         width: calc(100% - 10px);
-    }
+      }
     }
   }
   @media (max-width: 1300px) {
