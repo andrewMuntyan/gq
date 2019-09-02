@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react';
+
+import Items from '../components/Items';
 
 export default () => (
   <div>
-    <h1>I&apos;m Home</h1>
+    <Items />
   </div>
 );

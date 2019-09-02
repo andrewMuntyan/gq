@@ -24,6 +24,21 @@
         "extensions": [".js", ".jsx"]
       }
     ],
+    // "react/forbid-prop-types": [
+    //   1,
+    //   {
+    //     "forbid": ["any"]
+    //   }
+    // ],
+    // since we use next-js Link component
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/accessible-emoji": 0,
+    "jsx-a11y/anchor-is-valid": [
+      "warn",
+      {
+        "aspects": ["invalidHref"]
+      }
+    ],
     "quotes": [
       2,
       "single",
