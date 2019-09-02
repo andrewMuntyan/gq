@@ -1,6 +1,6 @@
 projects:
   app:
-    schemaPath: "src/schema.graphql"
+    schemaPath: "src/yoga.datamodel.graphql"
     extensions:
       endpoints:
         default: "http://localhost:4444"
