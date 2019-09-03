@@ -80,21 +80,22 @@ function CreateItem() {
     [state, setState]
   );
 
+  const createItem = useCallback(async (e, createItemMutation) => {
+    e.preventDefault();
+    const result = await createItemMutation();
+
+    Router.push({
+      pathname: '/item',
+      query: {
+        id: result.data.updateItem.id
+      }
+    });
+  }, []);
+
   return (
     <Mutation mutation={CREATE_ITEM_MUTATION} variables={state}>
-      {(createItem, { loading, error }) => (
-        <Form
-          onSubmit={async e => {
-            e.preventDefault();
-            const result = await createItem();
-            Router.push({
-              pathname: '/item',
-              query: {
-                id: result.data.createItem.id
-              }
-            });
-          }}
-        >
+      {(createItemMutation, { loading, error }) => (
+        <Form onSubmit={async e => createItem(e, createItemMutation)}>
           <Error error={error} />
           <fieldset disabled={loading} aria-busy={loading}>
             <label htmlFor="file">
@@ -118,7 +119,7 @@ function CreateItem() {
                 id="title"
                 placeholder="Title"
                 required
-                value={state.value}
+                value={state.title}
                 onChange={handleChange}
               />
             </label>
