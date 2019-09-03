@@ -75,6 +75,7 @@ function CreateItem() {
           largeImage: file.eager[0].secure_url
         });
       }
+      return file;
     },
     [state, setState]
   );
