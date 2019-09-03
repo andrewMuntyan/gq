@@ -1,7 +1,5 @@
-import React from "react";
+import React from 'react';
 
-export default () => (
-  <div>
-    <h1>I&apos;m Sell</h1>
-  </div>
-);
+import CreateItem from '../components/CreateItem';
+
+export default () => <CreateItem />;
