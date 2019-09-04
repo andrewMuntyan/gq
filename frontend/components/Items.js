@@ -1,14 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
 
 // eslint-disable-next-line import/no-cycle
 import Item from './Item';
+import Pagination from './Pagination';
+import { perPage } from '../config';
 
 export const ALL_ITEMS_QUERY = gql`
-  query ALL_ITEMS_QUERY {
-    items {
+  query ALL_ITEMS_QUERY($skip: Int = 0, $first: Int = ${perPage}) {
+    items(first: $first, skip: $skip, orderBy: title_DESC) {
       id
       title
       price
@@ -31,10 +34,18 @@ const ItemsList = styled.div`
   margin: 0 auto;
 `;
 
-const Items = () => {
+const Items = props => {
+  const { page } = props;
   return (
     <Center>
-      <Query query={ALL_ITEMS_QUERY}>
+      <Pagination page={page} />
+      <Query
+        query={ALL_ITEMS_QUERY}
+        fetchPolicy="network-only"
+        variables={{
+          skip: page * perPage - perPage
+        }}
+      >
         {({ data, error, loading }) => {
           if (loading) {
             return <p>Loading...</p>;
@@ -51,8 +62,13 @@ const Items = () => {
           );
         }}
       </Query>
+      <Pagination page={page} />
     </Center>
   );
+};
+
+Items.propTypes = {
+  page: PropTypes.number.isRequired
 };
 
 export default Items;
