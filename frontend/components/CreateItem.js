@@ -32,16 +32,21 @@ function CreateItem() {
     description: '',
     image: '',
     largeImage: '',
+    imageIsLoading: false,
     price: 0
   });
 
   const handleChange = useCallback(
     e => {
       const { name: stateKey, value, type } = e.target;
-
+      let finalValue = value;
+      if (type === 'number') {
+        const parsedNumber = parseFloat(value);
+        finalValue = Number.isNaN(parsedNumber) ? 0 : parsedNumber;
+      }
       const newState = {
         ...state,
-        [stateKey]: type === 'number' ? parseFloat(value) : value
+        [stateKey]: finalValue
       };
       setState(newState);
     },
@@ -50,6 +55,8 @@ function CreateItem() {
 
   const uploadFile = useCallback(
     async e => {
+      setState({ ...state, imageIsLoading: true });
+
       const { files } = e.target;
       if (!files.length) {
         return false;
@@ -58,26 +65,37 @@ function CreateItem() {
       data.append('file', files[0]);
       data.append('upload_preset', 'testgq');
 
-      const res = await fetch(
-        'https://api.cloudinary.com/v1_1/andriimuntian/image/upload',
-        {
-          method: 'POST',
-          body: data
+      try {
+        const res = await fetch(
+          'https://api.cloudinary.com/v1_1/andriimuntian/image/upload',
+          {
+            method: 'POST',
+            body: data
+          }
+        );
+        const file = await res.json();
+        if (!file.error) {
+          setState({
+            ...state,
+            image: file.secure_url,
+            largeImage: file.eager[0].secure_url,
+            imageIsLoading: false
+          });
         }
-      );
+        return file;
+      } catch (uploadingError) {
+        // eslint-disable-next-line no-console
+        console.log('uploadingError');
+        // eslint-disable-next-line no-console
+        console.log(uploadingError);
 
-      const file = await res.json();
-
-      if (!file.error) {
         setState({
-          ...state,
-          image: file.secure_url,
-          largeImage: file.eager[0].secure_url
+          imageIsLoading: false
         });
+        return Promise.reject(uploadingError);
       }
-      return file;
     },
-    [state, setState]
+    [setState, state]
   );
 
   const createItem = useCallback(async (e, createItemMutation) => {
@@ -87,71 +105,74 @@ function CreateItem() {
     Router.push({
       pathname: '/item',
       query: {
-        id: result.data.updateItem.id
+        id: result.data.createItem.id
       }
     });
   }, []);
 
   return (
     <Mutation mutation={CREATE_ITEM_MUTATION} variables={state}>
-      {(createItemMutation, { loading, error }) => (
-        <Form onSubmit={async e => createItem(e, createItemMutation)}>
-          <Error error={error} />
-          <fieldset disabled={loading} aria-busy={loading}>
-            <label htmlFor="file">
-              Image
-              <input
-                type="file"
-                name="file"
-                id="file"
-                placeholder="Upload an image"
-                required
-                onChange={uploadFile}
-              />
-              {state.image && <img src={state.image} alt={state.title} />}
-            </label>
+      {(createItemMutation, { loading, error }) => {
+        const disabled = state.imageIsLoading || loading;
+        return (
+          <Form onSubmit={async e => createItem(e, createItemMutation)}>
+            <Error error={error} />
+            <fieldset disabled={disabled} aria-busy={disabled}>
+              <label htmlFor="file">
+                Image
+                <input
+                  type="file"
+                  name="file"
+                  id="file"
+                  placeholder="Upload an image"
+                  // required
+                  onChange={uploadFile}
+                />
+                {state.image && <img src={state.image} alt={state.title} />}
+              </label>
 
-            <label htmlFor="title">
-              Title
-              <input
-                type="text"
-                name="title"
-                id="title"
-                placeholder="Title"
-                required
-                value={state.title}
-                onChange={handleChange}
-              />
-            </label>
+              <label htmlFor="title">
+                Title
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  placeholder="Title"
+                  required
+                  value={state.title}
+                  onChange={handleChange}
+                />
+              </label>
 
-            <label htmlFor="price">
-              Price
-              <input
-                type="number"
-                name="price"
-                id="price"
-                placeholder="Price"
-                required
-                value={state.price}
-                onChange={handleChange}
-              />
-            </label>
+              <label htmlFor="price">
+                Price
+                <input
+                  type="number"
+                  name="price"
+                  id="price"
+                  placeholder="Price"
+                  required
+                  value={state.price}
+                  onChange={handleChange}
+                />
+              </label>
 
-            <label htmlFor="description">
-              Description
-              <textarea
-                name="description"
-                id="description"
-                placeholder="Enter A Description"
-                required
-                value={state.description}
-                onChange={handleChange}
-              />
-            </label>
-            <button type="submit">Save</button>
-          </fieldset>
-        </Form>
-      )}
+              <label htmlFor="description">
+                Description
+                <textarea
+                  name="description"
+                  id="description"
+                  placeholder="Enter A Description"
+                  required
+                  value={state.description}
+                  onChange={handleChange}
+                />
+              </label>
+              <button type="submit">Save</button>
+            </fieldset>
+          </Form>
+        );
+      }}
     </Mutation>
   );
 }

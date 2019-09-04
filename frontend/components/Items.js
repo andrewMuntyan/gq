@@ -3,6 +3,7 @@ import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
 
+// eslint-disable-next-line import/no-cycle
 import Item from './Item';
 
 export const ALL_ITEMS_QUERY = gql`
