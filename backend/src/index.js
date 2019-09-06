@@ -8,6 +8,7 @@ const myEnv = dotenv.config({ path: dotenvPath });
 dotenvExpand(myEnv);
 
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 // create yoga server
 const createServer = require('./createServer');
@@ -16,7 +17,15 @@ const createServer = require('./createServer');
 const server = createServer();
 
 server.express.use(cookieParser());
-// TODO: use express middleware to populate current user
+// Decode JWT we can get userId on each request
+server.express.use((req, res, next) => {
+  const { token } = req.cookies;
+  if (token) {
+    const { userId } = jwt.verify(token, process.env.APP_SECRET);
+    req.userId = userId;
+  }
+  next();
+});
 
 server.start(
   {
