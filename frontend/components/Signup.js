@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
+import Router from 'next/router';
+
 import Form from './styles/Form';
 import Error from './ErrorMessage';
 
@@ -49,11 +51,20 @@ function Signup() {
             onSubmit={async e => {
               e.preventDefault();
               await signupMutation();
-              setState({
-                email: '',
-                password: '',
-                name: ''
-              });
+              const {
+                router: { route }
+              } = Router;
+              if (route === '/signup') {
+                Router.push({
+                  pathname: '/me'
+                });
+              } else {
+                setState({
+                  email: '',
+                  password: '',
+                  name: ''
+                });
+              }
             }}
           >
             <fieldset disabled={loading} aria-busy={loading}>

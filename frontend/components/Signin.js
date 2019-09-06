@@ -44,13 +44,20 @@ function Signin() {
             onSubmit={async e => {
               e.preventDefault();
               await signinMutation();
-              // setState({
-              //   email: '',
-              //   password: ''
-              // });
-              Router.push({
-                pathname: '/me'
-              });
+              const {
+                router: { route }
+              } = Router;
+
+              if (route === '/signup') {
+                Router.push({
+                  pathname: '/me'
+                });
+              } else {
+                setState({
+                  email: '',
+                  password: ''
+                });
+              }
             }}
           >
             <fieldset disabled={loading} aria-busy={loading}>
