@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Mutation } from 'react-apollo';
+import Router from 'next/router';
 import gql from 'graphql-tag';
 import Form from './styles/Form';
 import Error from './ErrorMessage';
@@ -43,9 +44,12 @@ function Signin() {
             onSubmit={async e => {
               e.preventDefault();
               await signinMutation();
-              setState({
-                email: '',
-                password: ''
+              // setState({
+              //   email: '',
+              //   password: ''
+              // });
+              Router.push({
+                pathname: '/me'
               });
             }}
           >
