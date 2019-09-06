@@ -4,12 +4,17 @@ import Link from 'next/link';
 import User from './User';
 
 import NavStyles from './styles/NavStyles';
+import Signout from './Signout';
 
 const Nav = () => (
   <User>
     {({ data: { me } }) => (
       <NavStyles>
-        {me && <a>{me.name}</a>}
+        {me && (
+          <Link href="/me">
+            <a>{me.name}</a>
+          </Link>
+        )}
         <Link href="/items">
           <a>Shop</a>
         </Link>
@@ -21,12 +26,12 @@ const Nav = () => (
             <Link href="/orders">
               <a>Orders</a>
             </Link>
-            <Link href="/me">
+            {/* <Link href="/me">
               <a>Account</a>
-            </Link>
-            <Link href="/">
+            </Link> */}
+            <Signout href="/">
               <a>Sign Out</a>
-            </Link>
+            </Signout>
           </>
         )}
         {!me && (
