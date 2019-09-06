@@ -3,16 +3,11 @@ import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import Form from './styles/Form';
 import Error from './ErrorMessage';
-
 import { CURRENT_USER_QUERY } from './User';
 
-const SIGNUP_MUTATION = gql`
-  mutation SIGNUP_MUTATION(
-    $email: String!
-    $name: String!
-    $password: String!
-  ) {
-    signup(email: $email, name: $name, password: $password) {
+const SIGNIN_MUTATION = gql`
+  mutation SIGNIN_MUTATION($email: String!, $password: String!) {
+    signin(email: $email, password: $password) {
       id
       email
       name
@@ -20,11 +15,10 @@ const SIGNUP_MUTATION = gql`
   }
 `;
 
-function Signup() {
+function Signin() {
   const [state, setState] = useState({
     email: '',
-    password: '',
-    name: ''
+    password: ''
   });
   const handleChange = useCallback(
     e => {
@@ -38,26 +32,25 @@ function Signup() {
   );
   return (
     <Mutation
-      mutation={SIGNUP_MUTATION}
+      mutation={SIGNIN_MUTATION}
       variables={{ ...state }}
       refetchQueries={[{ query: CURRENT_USER_QUERY }]}
     >
-      {(signupMutation, { loading, error }) => {
+      {(signinMutation, { loading, error }) => {
         return (
           <Form
             method="post"
             onSubmit={async e => {
               e.preventDefault();
-              await signupMutation();
+              await signinMutation();
               setState({
                 email: '',
-                password: '',
-                name: ''
+                password: ''
               });
             }}
           >
             <fieldset disabled={loading} aria-busy={loading}>
-              <h2>Sign Up for An Account</h2>
+              <h2>Sign into Your Account</h2>
               <Error error={error} />
               <label htmlFor="email">
                 email
@@ -81,18 +74,7 @@ function Signup() {
                   onChange={handleChange}
                 />
               </label>
-              <label htmlFor="name">
-                name
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  placeholder="name"
-                  value={state.name}
-                  onChange={handleChange}
-                />
-              </label>
-              <button type="submit">Sign Up</button>
+              <button type="submit">Sign In</button>
             </fieldset>
           </Form>
         );
@@ -101,4 +83,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Signin;
