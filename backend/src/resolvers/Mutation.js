@@ -58,7 +58,7 @@ const Mutations = {
 
     // 2. Check if they own that item, or have the permissions
     const ownsItem = item.user.id === userId;
-    const isAllowed = userPermissions.some((permission) => ['ADMIN', 'ITEMDELETE'].includes(permission),);
+    const isAllowed = userPermissions.some((permission) => ['ADMIN', 'ITEMDELETE'].includes(permission));
     if (!ownsItem || !isAllowed) {
       throw new Error('You do not have permission to do that');
     }
@@ -209,6 +209,54 @@ const Mutations = {
           permissions: { set: args.permissions },
         },
         where: { id: args.userId },
+      },
+      info,
+    );
+  },
+  async addToCart(parent, args, ctx, info) {
+    // 1. make sure there are signed in
+    const {
+      request: { userId },
+      db,
+    } = ctx;
+    const { id: itemId } = args;
+    if (!userId) {
+      throw new Error('You must be logged in to do that');
+    }
+
+    // 2. query the user current cart
+    const [existingCartItem] = await db.query.cartItems(
+      {
+        where: {
+          user: { id: userId },
+          item: { id: itemId },
+        },
+      },
+      info,
+    );
+    // 3. check of that item is already in their cart and increment by q if it is
+    if (existingCartItem) {
+      return db.mutation.updateCartItem(
+        {
+          where: {
+            id: existingCartItem.id,
+          },
+          data: { quantity: existingCartItem.quantity + 1 },
+        },
+        info,
+      );
+    }
+    // 4. if it's not, create a fresh CartItem for that user
+    return db.mutation.createCartItem(
+      {
+        data: {
+          user: {
+            connect: { id: userId },
+          },
+          item: {
+            connect: { id: itemId },
+          },
+        },
       },
       info,
     );
