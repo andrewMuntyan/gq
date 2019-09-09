@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 
 // create yoga server
 const createServer = require('./createServer');
-// const db = require('./db');
+const db = require('./db');
 
 const server = createServer();
 
@@ -25,6 +25,22 @@ server.express.use((req, res, next) => {
     req.userId = userId;
   }
   next();
+});
+
+// Create middleware that populates the user on each request
+server.express.use(async (req, res, next) => {
+  const { userId } = req;
+  // if they arent logged just skip
+  if (!userId) {
+    return next();
+  }
+  const user = await db.query.user(
+    { where: { id: userId } },
+    '{id, permissions, email, name}',
+  );
+
+  req.user = user;
+  return next();
 });
 
 server.start(

@@ -36,10 +36,11 @@ const DeleteButton = ({ children, id }) => {
         return (
           <button
             type="button"
-            onClick={() => {
+            onClick={async () => {
               // eslint-disable-next-line no-alert,no-restricted-globals
               if (confirm('Are you sure you want to delete this item?')) {
-                deleteItemMutation();
+                // eslint-disable-next-line no-alert,no-restricted-globals
+                deleteItemMutation().catch(error => alert(error.message));
               }
             }}
           >
