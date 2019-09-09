@@ -7,6 +7,10 @@ import CartStyles from './styles/CartStyles';
 import Supreme from './styles/Supreme';
 import CloseButton from './styles/CloseButton';
 import Button from './styles/Button';
+import User from './User';
+import CartItem from './CartItem';
+import calcTotalPrice from '../lib/calcTotalPrice';
+import formatMoney from '../lib/formatMoney';
 
 export const LOCAL_STATE_QUERY = gql`
   query {
@@ -22,31 +26,48 @@ export const TOGGLE_CART_MUTATION = gql`
 
 const Cart = () => {
   return (
-    <Mutation mutation={TOGGLE_CART_MUTATION}>
-      {toggleCartMutation => {
+    <User>
+      {({ data: { me } }) => {
+        if (!me) {
+          return null;
+        }
         return (
-          <Query query={LOCAL_STATE_QUERY}>
-            {({ data: { cartOpen } }) => {
+          <Mutation mutation={TOGGLE_CART_MUTATION}>
+            {toggleCartMutation => {
               return (
-                <CartStyles open={cartOpen}>
-                  <header>
-                    <CloseButton onClick={toggleCartMutation}>
-                      &times;
-                    </CloseButton>
-                    <Supreme>Your Cart</Supreme>
-                    <p>You have __ Items in your Cart</p>
-                    <footer>
-                      <p>$10.10</p>
-                      <Button>Checkout</Button>
-                    </footer>
-                  </header>
-                </CartStyles>
+                <Query query={LOCAL_STATE_QUERY}>
+                  {({ data: { cartOpen } }) => {
+                    return (
+                      <CartStyles open={cartOpen}>
+                        <header>
+                          <CloseButton onClick={toggleCartMutation}>
+                            &times;
+                          </CloseButton>
+                          <Supreme>{me.name}&apos;s Cart</Supreme>
+                          <p>
+                            You have {me.cart.length} Item
+                            {me.cart.length === 1 ? '' : 's'} in your Cart
+                          </p>
+                        </header>
+                        <ul>
+                          {me.cart.map(cartItem => (
+                            <CartItem key={cartItem.id} cartItem={cartItem} />
+                          ))}
+                        </ul>
+                        <footer>
+                          <p>{formatMoney(calcTotalPrice(me.cart))}</p>
+                          <Button>Checkout</Button>
+                        </footer>
+                      </CartStyles>
+                    );
+                  }}
+                </Query>
               );
             }}
-          </Query>
+          </Mutation>
         );
       }}
-    </Mutation>
+    </User>
   );
 };
 
