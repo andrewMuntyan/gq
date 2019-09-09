@@ -5,7 +5,7 @@ import { Query, Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import ErrorMessage from './ErrorMessage';
 import Table from './styles/Table';
-import Button from './styles/SickButton';
+import Button from './styles/Button';
 
 const UPDATE_PERMISSIONS_MUTATION = gql`
   mutation UPDATE_PERMISSIONS_MUTATION(
